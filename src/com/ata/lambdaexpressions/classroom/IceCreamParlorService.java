@@ -85,8 +85,8 @@ public class IceCreamParlorService {
      */
     public int prepareFlavors(List<String> flavorNames) {
         List<Recipe> recipes = map(
-            flavorNames,
-            (flavorName) -> {
+            flavorNames,            // will be called input in the helper method
+            (flavorName) -> {      // will be called 'converter in the helper method
                 // trap the checked exception, RecipeNotFoundException, and
                 // wrap in a runtime exception because our lambda can't throw
                 // checked exceptions
@@ -119,9 +119,9 @@ public class IceCreamParlorService {
         // don't change any of the lines that touch cartonsCreated.
         int cartonsCreated = 0;
         for (Queue<Ingredient> ingredients : ingredientQueues) {
-
+// using a no argument lambda expression to get elements out of the queue
             // PHASE 4: provide Supplier to prepareIceCream()
-            if (iceCreamMaker.prepareIceCreamCarton(null)) {
+            if (iceCreamMaker.prepareIceCreamCarton(() -> ingredients.poll())) {
                 cartonsCreated++;
             }
         }
@@ -135,7 +135,7 @@ public class IceCreamParlorService {
      *
      * (We will get to Java streams in a later lesson, at which point we won't need a helper method
      * like this.)
-     * 
+     *
      * @param List
      * @param Functional reference- means a named method or a lambda expression
      *                   <T,R> this indicates that two generic data types will be referenced

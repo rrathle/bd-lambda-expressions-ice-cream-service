@@ -1,5 +1,6 @@
 package com.ata.lambdaexpressions.classroom;
 
+import com.ata.lambdaexpressions.classroom.converter.RecipeConverter;
 import com.ata.lambdaexpressions.classroom.dao.CartonDao;
 import com.ata.lambdaexpressions.classroom.dao.RecipeDao;
 import com.ata.lambdaexpressions.classroom.exception.CartonCreationFailedException;
@@ -52,7 +53,8 @@ public class IceCreamParlorService {
         List<Carton> cartons = cartonDao.getCartonsByFlavorNames(flavorNames);
 
         // PHASE 1: Use removeIf() to remove any empty cartons from cartons
-
+        cartons.removeIf(carton -> cartons.isEmpty());
+//        cartons.removeIf(Carton::isEmpty); this would be a method reference same as above
         return buildSundae(cartons);
     }
 
@@ -63,6 +65,10 @@ public class IceCreamParlorService {
         // PHASE 2: Use forEach() to add one scoop of each flavor
         // remaining in cartons
 
+        //Go through the list of cartons that was passed and get one scoop for each sundar
+        // since cartons is a list we can use the list forEach instead of the stream
+
+        cartons.forEach(aCarton -> sundae.addScoop(aCarton.getFlavor()));
         return sundae;
     }
 
@@ -93,7 +99,17 @@ public class IceCreamParlorService {
         );
 
         // PHASE 3: Replace right hand side: use map() to convert List<Recipe> to List<Queue<Ingredient>>
-        List<Queue<Ingredient>> ingredientQueues = new ArrayList<>();
+       // List<Queue<Ingredient>> ingredientQueues = new ArrayList<>();
+
+        //since all we will be doing in the lambda expression is calling a static method
+        // on a class we can use a method reference for the lambda expression
+//        List<Queue<Ingredient>> ingredientQueues = recipes.stream().map(RecipeConverter::fromRecipeToIngredientQueue
+//                .collect(Collectors.toList());
+
+        List<Queue<Ingredient>> ingredientQueues = recipes.stream().map
+                        (aRecipe -> RecipeConverter.fromRecipeToIngredientQueue(aRecipe))
+                .collect(Collectors.toList());
+
 
         return makeIceCreamCartons(ingredientQueues);
     }
@@ -119,6 +135,10 @@ public class IceCreamParlorService {
      *
      * (We will get to Java streams in a later lesson, at which point we won't need a helper method
      * like this.)
+     * 
+     * @param List
+     * @param Functional reference- means a named method or a lambda expression
+     *                   <T,R> this indicates that two generic data types will be referenced
      */
     private <T, R> List<R> map(List<T> input, Function<T, R> converter) {
         return input.stream()
